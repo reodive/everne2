@@ -55,7 +55,7 @@
       <p class="lead">年齢・経験を問わず歓迎します。※未成年は保護者同意が必要です。</p>
     </header>
 
-    <form id="applyForm" class="card" method="POST" action="/api/apply" enctype="multipart/form-data" novalidate>
+    <form id="applyForm" class="card" enctype="multipart/form-data" novalidate>
       <!-- ↑ バックエンドが未実装なら一旦 action="#" に。Formspree等を使うならそのURLに置換。 -->
 
       <!-- 1. 応募者情報 -->
@@ -91,8 +91,8 @@
         </div>
         <div>
           <label>電話番号（ハイフン可）<span class="req">＊</span></label>
-          <input type="tel" name="tel" required placeholder="例）090-1234-5678" inputmode="tel">
-          <div class="error" data-err="tel">電話番号を入力してください。</div>
+          <input type="tel" name="phone" required placeholder="例）090-1234-5678" inputmode="tel">
+          <div class="error" data-err="phone">電話番号を入力してください。</div>
         </div>
         <div>
           <label>居住エリア（任意）</label>
@@ -103,6 +103,16 @@
           <select name="experienced">
             <option value="未経験">未経験</option>
             <option value="経験あり">経験あり</option>
+          </select>
+        </div>
+        <div>
+          <label>カテゴリ</label>
+          <select name="category">
+            <option value="">選択してください</option>
+            <option value="Ladies">Ladies</option>
+            <option value="Men">Men</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Kids">Kids</option>
           </select>
         </div>
       </div>
@@ -136,7 +146,7 @@
       <div class="grid">
         <div>
           <label>自由記述（任意）</label>
-          <textarea name="pr" rows="6" placeholder="例）得意分野、活動希望、SNSリンク等"></textarea>
+          <textarea name="message" rows="6" placeholder="例）得意分野、活動希望、SNSリンク等"></textarea>
         </div>
       </div>
 
@@ -166,7 +176,7 @@
       </ul>
 
       <div class="inline" style="margin-top:8px">
-        <input id="agree" type="checkbox" required>
+        <input id="agree" name="agree" type="checkbox" value="true" required>
         <label for="agree">上記およびプライバシーポリシーに同意します<span class="req">＊</span></label>
       </div>
       <div class="error" data-err="agree">同意が必要です。</div>
@@ -177,76 +187,12 @@
       </div>
 
       <div class="ok" id="okMsg">送信中…完了後は結果画面に遷移します。</div>
+      <noscript><p style="color:#c00;margin-top:10px;">JavaScriptが無効のためフォームを送信できません。</p></noscript>
     </form>
 
     <footer>© Everne</footer>
   </div>
 
-  <script>
-    // ユーティリティ
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
-
-    const form = $('#applyForm');
-    const guardianBlock = $('#guardianBlock');
-    const okMsg = $('#okMsg');
-
-    // 年齢に応じて保護者欄を表示
-    form.age.addEventListener('input', () => {
-      const age = Number(form.age.value || 0);
-      guardianBlock.style.display = age < 18 ? 'block' : 'none';
-    });
-
-    // 送信前バリデーション
-    form.addEventListener('submit', (e) => {
-      // 手動で細かくチェック
-      let valid = true;
-      // 全エラー非表示
-      $$('.error').forEach(el => el.style.display='none');
-
-      const must = ['name','kana','age','email','tel'];
-      must.forEach(n => {
-        if(!form[n].value.trim()){ showErr(n); valid=false; }
-      });
-
-      // メール形式
-      if(form.email.value && !/^\S+@\S+\.\S+$/.test(form.email.value)){ showErr('email'); valid=false; }
-
-      // 写真: 1〜3枚 / 拡張子 / 5MB以下
-      const files = $('#photos').files;
-      if(files.length === 0 || files.length > 3){ showErr('photos'); valid=false; }
-      else{
-        for(const f of files){
-          const okExt = /\.(jpe?g|png)$/i.test(f.name);
-          if(!okExt || f.size > 5*1024*1024){ showErr('photos'); valid=false; break; }
-        }
-      }
-
-      // 未成年は保護者必須
-      const age = Number(form.age.value || 0);
-      if(age < 18){
-        if(!form.guardian_name.value.trim()){ showErr('guardian_name'); valid=false; }
-        if(!form.guardian_contact.value.trim()){ showErr('guardian_contact'); valid=false; }
-      }
-
-      // 同意
-      if(!$('#agree').checked){ showErr('agree'); valid=false; }
-
-      if(!valid){
-        e.preventDefault();
-        window.scrollTo({top: form.getBoundingClientRect().top + window.scrollY - 20, behavior:'smooth'});
-        return;
-      }
-
-      // フロント側の送信中表示（任意）
-      $('#submitBtn').disabled = true;
-      okMsg.style.display = 'block';
-    });
-
-    function showErr(name){
-      const el = document.querySelector(`[data-err="${name}"]`);
-      if(el){ el.style.display='block'; }
-    }
-  </script>
+  <script src="js/apply.js" defer></script>
 </body>
 </html>

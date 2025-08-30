@@ -1,6 +1,5 @@
 
 
-
 const slides = document.querySelector('.slides');
 const slideItems = document.querySelectorAll('.slide');
 const prevBtn = document.getElementById('prev');
