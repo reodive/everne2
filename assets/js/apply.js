@@ -1,31 +1,53 @@
-const API_BASE = 'http://localhost:5174';
+// js/apply.js
+const API_BASE = 'http://127.0.0.1:5174';
+console.debug('[apply] API_BASE =', API_BASE);
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('applyForm');
-  const state = document.getElementById('applyState');
   const btn = document.getElementById('submitBtn');
   const agree = document.getElementById('agree');
+  // 状態表示要素（存在しなければ #okMsg を使う or 生成）
+  let state = document.getElementById('applyState') || document.getElementById('okMsg');
+  if (!state) {
+    state = document.createElement('p');
+    state.id = 'applyState';
+    state.className = 'ok';
+    form.appendChild(state);
+  }
+
+  // 年齢に応じて保護者欄の表示切替
+  const ageInput = form?.elements?.age;
+  const guardianBlock = document.getElementById('guardianBlock');
+  if (ageInput && guardianBlock) {
+    const toggleGuardian = () => {
+      const age = Number(ageInput.value || 0);
+      guardianBlock.style.display = age < 18 ? 'block' : 'none';
+    };
+    ageInput.addEventListener('input', toggleGuardian);
+    toggleGuardian();
+  }
 
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault();               // ← これが無いとページ遷移する
     state.textContent = '';
     if (!agree.checked) { state.textContent = '同意が必要です。'; return; }
 
     const fd = new FormData(form);
-    fd.append('agree', 'true');
+    // 念のため agree を文字列でサーバへ
+    if (!fd.has('agree')) fd.append('agree', 'true');
 
     btn.disabled = true;
     btn.textContent = '送信中…';
 
     try {
       const res = await fetch(`${API_BASE}/api/apply`, { method: 'POST', body: fd });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error('送信に失敗しました');
       state.textContent = '送信しました。担当者よりご連絡します。';
       form.reset();
     } catch (err) {
-      state.textContent = 'エラー: 送信できませんでした。時間をおいて再度お試しください。';
       console.error(err);
+      state.textContent = 'エラー: 送信できませんでした。';
     } finally {
       btn.disabled = false;
       btn.textContent = '送信する';
