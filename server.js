@@ -10,8 +10,18 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 5174;
 
+// CORS: allow configured origins; if none provided, allow all.
+const ALLOWED_ORIGINS = (process.env.FRONT_ORIGIN || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
 app.use(cors({
-  origin: process.env.FRONT_ORIGIN?.split(',') ?? true
+  origin: (origin, cb) => {
+    if (ALLOWED_ORIGINS.length === 0) return cb(null, true);
+    // Allow file:// (no origin) and explicit matches
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  }
 }));
 app.use(express.json());
 
@@ -85,18 +95,23 @@ app.post(
       f.message || '(なし)'
     ].join('\n');
 
+    let mailStatus = 'skipped';
     try {
-      await transporter.sendMail({
-        from: process.env.MAIL_FROM,
-        to: process.env.MAIL_TO,
-        subject: `【応募】${f.name} さんより`,
-        text,
-        attachments: files.map(file => ({
-          filename: file.originalname,
-          content: file.buffer,
-          contentType: file.mimetype
+      // 送信設定が揃っていない場合はメール送信をスキップ
+      if (process.env.SMTP_HOST && process.env.MAIL_TO && process.env.MAIL_FROM) {
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM,
+          to: process.env.MAIL_TO,
+          subject: `【応募】${f.name} さんより`,
+          text,
+          attachments: files.map(file => ({
+            filename: file.originalname,
+            content: file.buffer,
+            contentType: file.mimetype
         }))
-      });
+        });
+        mailStatus = 'sent';
+      }
 
       // CSVログ
       fs.appendFileSync(path.join(LOG_DIR, 'apply.csv'),
@@ -116,14 +131,16 @@ app.post(
         size: f.size || '',
         category: f.category || '',
         message: f.message || '',
-        files: savedFiles
+        files: savedFiles,
+        mailStatus
       };
       fs.appendFileSync(path.join(DATA_DIR, 'applications.jsonl'), JSON.stringify(record) + '\n');
 
-      res.json({ ok: true });
+      res.json({ ok: true, mailStatus });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ ok: false, error: 'send_failed' });
+      // メール送信や保存のどこかで失敗
+      res.status(500).json({ ok: false, error: 'server_error' });
     }
   }
 );

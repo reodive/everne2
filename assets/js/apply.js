@@ -42,12 +42,21 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch(`${API_BASE}/api/apply`, { method: 'POST', body: fd });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.ok) throw new Error('送信に失敗しました');
-      state.textContent = '送信しました。担当者よりご連絡します。';
+      if (!res.ok || !data.ok) {
+        const msg = data?.errors?.[0]?.msg || data?.error || '送信に失敗しました';
+        throw new Error(msg);
+      }
+      if (data.mailStatus === 'sent') {
+        state.textContent = '送信しました。担当者よりご連絡します。';
+      } else if (data.mailStatus === 'skipped') {
+        state.textContent = '送信完了（メール通知は設定未完了のため未送信）。管理画面に保存済み。';
+      } else {
+        state.textContent = '送信完了（メール通知に失敗）。管理画面に保存済み。';
+      }
       form.reset();
     } catch (err) {
       console.error(err);
-      state.textContent = 'エラー: 送信できませんでした。';
+      state.textContent = `エラー: ${err.message}`;
     } finally {
       btn.disabled = false;
       btn.textContent = '送信する';
