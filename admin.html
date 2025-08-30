@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>管理 | 応募一覧</title>
+  <title>管理 | 応募/ニュース/メンバー</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     body{background:#f6f7f9}
-    .wrap{max-width:1000px;margin:24px auto;padding:0 16px}
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
     .card{background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.06);padding:16px}
     .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
     input[type="search"]{padding:8px 10px;border:1px solid #ddd;border-radius:8px}
@@ -16,13 +16,26 @@
     th{background:#fafafa}
     .files a{display:inline-block;margin-right:8px}
     .muted{color:#666;font-size:12px}
+    .tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tabs button{padding:8px 12px;border:1px solid #ddd;border-radius:999px;background:#fff;cursor:pointer}
+    .tabs button.active{background:#e65100;color:#fff;border-color:#e65100}
+    .grid{display:grid;gap:10px}
+    @media(min-width:800px){.grid-2{grid-template-columns:1fr 1fr}}
+    .thumb{width:40px;height:40px;object-fit:cover;border-radius:4px}
   </style>
   <script defer src="assets/js/admin.js"></script>
   </head>
   <body>
     <div class="wrap">
-      <h1>応募一覧</h1>
-      <div class="card">
+      <h1>管理</h1>
+      <div class="tabs">
+        <button class="active" data-tab="apps">応募</button>
+        <button data-tab="news">ニュース</button>
+        <button data-tab="members">メンバー</button>
+      </div>
+
+      <!-- 応募 -->
+      <section id="appsSection" class="card">
         <div class="toolbar">
           <input id="q" type="search" placeholder="氏名/メール/カテゴリで検索" />
           <button id="reload">再読み込み</button>
@@ -44,8 +57,84 @@
             <tbody></tbody>
           </table>
         </div>
-      </div>
+      </section>
+
+      <!-- ニュース -->
+      <section id="newsSection" class="card" style="display:none">
+        <h2>ニュース</h2>
+        <div class="grid grid-2" style="margin-bottom:12px">
+          <div>
+            <label>タイトル</label>
+            <input id="newsTitle" type="text" placeholder="例）ひまわり牛乳のCM出演" />
+          </div>
+          <div>
+            <label>日付</label>
+            <input id="newsDate" type="date" />
+          </div>
+          <div>
+            <label>概要</label>
+            <input id="newsSummary" type="text" placeholder="短い説明" />
+          </div>
+          <div>
+            <label>リンク（任意）</label>
+            <input id="newsLink" type="url" placeholder="https://…" />
+          </div>
+          <div class="inline">
+            <label><input id="newsActive" type="checkbox" checked /> 公開</label>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="newsAdd">追加</button>
+          <span class="muted" id="newsStatus"></span>
+        </div>
+        <table id="newsTable">
+          <thead><tr><th>日付</th><th>タイトル</th><th>概要</th><th>リンク</th><th>公開</th><th>操作</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- メンバー -->
+      <section id="membersSection" class="card" style="display:none">
+        <h2>メンバー</h2>
+        <div class="grid grid-2" style="margin-bottom:12px">
+          <div>
+            <label>氏名</label>
+            <input id="memName" type="text" placeholder="例）田中めぐみ" />
+          </div>
+          <div>
+            <label>カテゴリ</label>
+            <select id="memCategory">
+              <option value="Ladies">Ladies</option>
+              <option value="Men">Men</option>
+              <option value="Mrs">Mrs</option>
+              <option value="Kids">Kids</option>
+            </select>
+          </div>
+          <div>
+            <label>画像ファイル（任意）</label>
+            <input id="memFile" type="file" accept="image/*" />
+          </div>
+          <div>
+            <label>画像URL（任意、上が無ければこちら）</label>
+            <input id="memImage" type="text" placeholder="/uploads/xxx.jpg or /image/user-icon.png" />
+          </div>
+          <div>
+            <label>順序</label>
+            <input id="memOrder" type="number" value="0" />
+          </div>
+          <div class="inline">
+            <label><input id="memActive" type="checkbox" checked /> 公開</label>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="memAdd">追加</button>
+          <span class="muted" id="memStatus"></span>
+        </div>
+        <table id="memTable">
+          <thead><tr><th>画像</th><th>氏名</th><th>カテゴリ</th><th>順序</th><th>公開</th><th>操作</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
     </div>
   </body>
   </html>
-

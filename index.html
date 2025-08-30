@@ -2,8 +2,9 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Everne</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/style.css?v=2" />
 </head>
 <body>
 <header class="navbar">
@@ -117,32 +118,7 @@
     <a href="news.html" class="more-link">More&gt;</a>
   </div>
 
-  <div class="news-cards">
-    <article class="news-card">
-      <h3>TOPICS</h3>
-      <hr />
-      <p>地方CM「ひまわり牛乳」出演決定！</p>
-      <time datetime="2025-08-01">2025/08/01</time>
-    </article>
-    <article class="news-card">
-      <h3>TOPICS</h3>
-      <hr />
-      <p>地方CM「ひまわり牛乳」出演決定！</p>
-      <time datetime="2025-08-01">2025/08/01</time>
-    </article>
-    <article class="news-card">
-      <h3>TOPICS</h3>
-      <hr />
-      <p>地方CM「ひまわり牛乳」出演決定！</p>
-      <time datetime="2025-08-01">2025/08/01</time>
-    </article>
-    <article class="news-card">
-      <h3>TOPICS</h3>
-      <hr />
-      <p>地方CM「ひまわり牛乳」出演決定！</p>
-      <time datetime="2025-08-01">2025/08/01</time>
-    </article>
-  </div>
+  <div class="news-cards" id="newsCards"></div>
 </section>
 
 <section id="models" class="models-section">
@@ -154,24 +130,7 @@
       <h3 class="ladies">Ladies</h3>
       <a href="ladies.html" class="more-link">More&gt;</a>
     </div>
-    <div class="model-list">
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-    </div>
+    <div class="model-list" id="list-ladies"></div>
   </div>
 
   <!-- Men -->
@@ -180,24 +139,7 @@
       <h3 class="men">Men</h3>
       <a href="men.html" class="more-link">More&gt;</a>
     </div>
-    <div class="model-list">
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-    </div>
+    <div class="model-list" id="list-men"></div>
   </div>
 
   <!-- Mrs -->
@@ -206,24 +148,7 @@
       <h3 class="mrs">Mrs</h3>
       <a href="mrs.html" class="more-link">More&gt;</a>
     </div>
-    <div class="model-list">
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-      <div class="model-card">
-        <img src="image/user-icon.png" alt="田中めぐみ">
-        <p>田中めぐみ</p>
-      </div>
-    </div>
+    <div class="model-list" id="list-mrs"></div>
   </div>
 </section>
 
@@ -275,6 +200,7 @@
 </footer>
   
   <!-- Scripts -->
+  <script src="assets/js/site-data.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>

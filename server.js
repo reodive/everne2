@@ -58,6 +58,14 @@ const LOG_DIR = path.join(process.cwd(), 'logs');
 for (const dir of [DATA_DIR, UPLOAD_DIR, LOG_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
+const NEWS_FILE = path.join(DATA_DIR, 'news.json');
+const MEMBERS_FILE = path.join(DATA_DIR, 'members.json');
+
+const readJson = (file, fallback) => {
+  try { if (!fs.existsSync(file)) return fallback; return JSON.parse(fs.readFileSync(file, 'utf8') || ''); } catch { return fallback; }
+};
+const writeJson = (file, data) => { fs.writeFileSync(file, JSON.stringify(data, null, 2)); };
+const uid = () => `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
 
 // 管理用トークン検証（未設定ならパス）
 const checkAdmin = (req, res, next) => {
@@ -157,6 +165,100 @@ app.post(
     }
   }
 );
+
+// -------- News APIs --------
+// Public: list news
+app.get('/api/news', (_req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  const filtered = items.filter(n => n.active !== false).sort((a,b) => new Date(b.date||b.createdAt) - new Date(a.date||a.createdAt));
+  res.json({ ok: true, items: filtered });
+});
+// Admin: list
+app.get('/api/admin/news', checkAdmin, (_req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  res.json({ ok: true, items });
+});
+// Admin: create
+app.post('/api/admin/news', checkAdmin, (req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  const { title, summary = '', date = new Date().toISOString().slice(0,10), link = '', active = true } = req.body || {};
+  if (!title) return res.status(400).json({ ok:false, error:'title_required' });
+  const item = { id: uid(), createdAt: new Date().toISOString(), title, summary, date, link, active: !!active };
+  items.push(item); writeJson(NEWS_FILE, items);
+  res.json({ ok: true, item });
+});
+// Admin: update
+app.put('/api/admin/news/:id', checkAdmin, (req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  const idx = items.findIndex(n => n.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ ok:false, error:'not_found' });
+  const prev = items[idx];
+  const next = { ...prev, ...req.body, id: prev.id };
+  items[idx] = next; writeJson(NEWS_FILE, items);
+  res.json({ ok:true, item: next });
+});
+// Admin: delete
+app.delete('/api/admin/news/:id', checkAdmin, (req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  const next = items.filter(n => n.id !== req.params.id);
+  if (next.length === items.length) return res.status(404).json({ ok:false, error:'not_found' });
+  writeJson(NEWS_FILE, next); res.json({ ok:true });
+});
+
+// -------- Members APIs --------
+const CATEGORIES = ['Ladies','Men','Mrs','Kids'];
+// Public: list
+app.get('/api/members', (req, res) => {
+  const items = readJson(MEMBERS_FILE, []);
+  let filtered = items.filter(m => m.active !== false);
+  const cat = req.query.category; if (cat) filtered = filtered.filter(m => m.category === cat);
+  filtered.sort((a,b)=> (a.order??0)-(b.order??0) || new Date(b.createdAt)-new Date(a.createdAt));
+  res.json({ ok:true, items: filtered });
+});
+// Admin: list
+app.get('/api/admin/members', checkAdmin, (_req, res) => {
+  const items = readJson(MEMBERS_FILE, []);
+  res.json({ ok:true, items });
+});
+// Admin: create
+app.post('/api/admin/members', checkAdmin, (req, res) => {
+  const items = readJson(MEMBERS_FILE, []);
+  const { name, category, image = '', note = '', order = 0, active = true } = req.body || {};
+  if (!name) return res.status(400).json({ ok:false, error:'name_required' });
+  if (!category || !CATEGORIES.includes(category)) return res.status(400).json({ ok:false, error:'invalid_category' });
+  const item = { id: uid(), createdAt: new Date().toISOString(), name, category, image, note, order:Number(order)||0, active: !!active };
+  items.push(item); writeJson(MEMBERS_FILE, items);
+  res.json({ ok:true, item });
+});
+// Admin: update
+app.put('/api/admin/members/:id', checkAdmin, (req, res) => {
+  const items = readJson(MEMBERS_FILE, []);
+  const idx = items.findIndex(m => m.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ ok:false, error:'not_found' });
+  const prev = items[idx];
+  const payload = req.body || {};
+  if (payload.category && !CATEGORIES.includes(payload.category)) return res.status(400).json({ ok:false, error:'invalid_category' });
+  const next = { ...prev, ...payload, id: prev.id };
+  items[idx] = next; writeJson(MEMBERS_FILE, items);
+  res.json({ ok:true, item: next });
+});
+// Admin: delete
+app.delete('/api/admin/members/:id', checkAdmin, (req, res) => {
+  const items = readJson(MEMBERS_FILE, []);
+  const next = items.filter(m => m.id !== req.params.id);
+  if (next.length === items.length) return res.status(404).json({ ok:false, error:'not_found' });
+  writeJson(MEMBERS_FILE, next); res.json({ ok:true });
+});
+
+// Admin: upload a single file (image) and return saved path
+app.post('/api/admin/upload', checkAdmin, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ ok:false, error:'file_required' });
+  const file = req.file;
+  const safeName = `${Date.now()}_${file.originalname}`.replace(/[^\w.\-]/g, '_');
+  const abs = path.join(UPLOAD_DIR, safeName);
+  fs.writeFileSync(abs, file.buffer);
+  res.json({ ok:true, path: `/uploads/${safeName}`, filename: safeName, mimetype: file.mimetype, size: file.size });
+});
 
 // 管理: 一覧取得（JSON）
 app.get('/api/admin/applications', checkAdmin, (req, res) => {
