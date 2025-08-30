@@ -28,6 +28,23 @@ const transporter = nodemailer.createTransport({
 });
 
 // API: 応募受付
+// 保存先準備
+const DATA_DIR = path.join(process.cwd(), 'data');
+const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
+const LOG_DIR = path.join(process.cwd(), 'logs');
+for (const dir of [DATA_DIR, UPLOAD_DIR, LOG_DIR]) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
+
+// 管理用トークン検証（未設定ならパス）
+const checkAdmin = (req, res, next) => {
+  const token = process.env.ADMIN_TOKEN;
+  if (!token) return next();
+  const provided = req.headers['x-admin-token'];
+  if (provided === token) return next();
+  return res.status(401).json({ ok: false, error: 'unauthorized' });
+};
+
 app.post(
   '/api/apply',
   upload.array('photos', 5),
@@ -43,6 +60,15 @@ app.post(
 
     const f = req.body; // name, kana, age, height, category, message など
     const files = req.files ?? [];
+
+    // 画像を保存
+    const savedFiles = [];
+    for (const file of files) {
+      const safeName = `${Date.now()}_${file.originalname}`.replace(/[^\w.\-]/g, '_');
+      const abs = path.join(UPLOAD_DIR, safeName);
+      fs.writeFileSync(abs, file.buffer);
+      savedFiles.push({ filename: safeName, mimetype: file.mimetype, size: file.size, path: `uploads/${safeName}` });
+    }
 
     // メール本文
     const text = [
@@ -72,12 +98,27 @@ app.post(
         }))
       });
 
-      // ついでにログ（任意）
-      const logDir = path.join(process.cwd(), 'logs');
-      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
-      fs.appendFileSync(path.join(logDir, 'apply.csv'),
+      // CSVログ
+      fs.appendFileSync(path.join(LOG_DIR, 'apply.csv'),
         `"${new Date().toISOString()}","${f.name}","${f.email}","${f.phone}","${(f.category||'').replace(/"/g,'""')}"\n`
       );
+
+      // JSON Lines 保存（管理画面用）
+      const record = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString(),
+        name: f.name,
+        kana: f.kana || '',
+        email: f.email,
+        phone: f.phone,
+        age: f.age || '',
+        height: f.height || '',
+        size: f.size || '',
+        category: f.category || '',
+        message: f.message || '',
+        files: savedFiles
+      };
+      fs.appendFileSync(path.join(DATA_DIR, 'applications.jsonl'), JSON.stringify(record) + '\n');
 
       res.json({ ok: true });
     } catch (err) {
@@ -86,5 +127,34 @@ app.post(
     }
   }
 );
+
+// 管理: 一覧取得（JSON）
+app.get('/api/admin/applications', checkAdmin, (req, res) => {
+  const file = path.join(DATA_DIR, 'applications.jsonl');
+  if (!fs.existsSync(file)) return res.json({ ok: true, items: [] });
+  const lines = fs.readFileSync(file, 'utf8').trim().split(/\n+/).filter(Boolean);
+  const items = lines.map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json({ ok: true, items });
+});
+
+// 管理: CSVダウンロード
+app.get('/api/admin/applications.csv', checkAdmin, (req, res) => {
+  const file = path.join(DATA_DIR, 'applications.jsonl');
+  if (!fs.existsSync(file)) return res.send('createdAt,name,email,phone,category\n');
+  const lines = fs.readFileSync(file, 'utf8').trim().split(/\n+/).filter(Boolean);
+  const rows = ['createdAt,name,email,phone,category'];
+  for (const l of lines) {
+    try {
+      const r = JSON.parse(l);
+      rows.push([r.createdAt, r.name, r.email, r.phone, r.category].map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(','));
+    } catch {}
+  }
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.send(rows.join('\n'));
+});
+
+// 保存したアップロードファイルを静的配信
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.listen(PORT, () => console.log(`Form server on http://localhost:${PORT}`));

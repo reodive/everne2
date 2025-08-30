@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>管理 | 応募一覧</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body{background:#f6f7f9}
+    .wrap{max-width:1000px;margin:24px auto;padding:0 16px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.06);padding:16px}
+    .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+    input[type="search"]{padding:8px 10px;border:1px solid #ddd;border-radius:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+    th{background:#fafafa}
+    .files a{display:inline-block;margin-right:8px}
+    .muted{color:#666;font-size:12px}
+  </style>
+  <script defer src="assets/js/admin.js"></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>応募一覧</h1>
+      <div class="card">
+        <div class="toolbar">
+          <input id="q" type="search" placeholder="氏名/メール/カテゴリで検索" />
+          <button id="reload">再読み込み</button>
+          <a id="csv" href="#">CSVダウンロード</a>
+        </div>
+        <div class="muted" id="status"></div>
+        <div class="table-wrap">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>日時</th>
+                <th>氏名</th>
+                <th>連絡先</th>
+                <th>カテゴリ</th>
+                <th>メッセージ</th>
+                <th>写真</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+
