@@ -187,6 +187,25 @@ app.post('/api/admin/news', checkAdmin, (req, res) => {
   items.push(item); writeJson(NEWS_FILE, items);
   res.json({ ok: true, item });
 });
+
+// Admin: create (multipart) — supports file upload or imageUrl
+app.post('/api/admin/news/create', checkAdmin, upload.single('image'), (req, res) => {
+  const items = readJson(NEWS_FILE, []);
+  let { title, summary = '', date, link = '', imageUrl = '', active = 'true' } = req.body || {};
+  if (!title) return res.status(400).json({ ok:false, error:'title_required' });
+  date = date || new Date().toISOString().slice(0,10);
+  let image = '';
+  if (req.file) {
+    const safeName = `${Date.now()}_${req.file.originalname}`.replace(/[^\w.\-]/g, '_');
+    fs.writeFileSync(path.join(UPLOAD_DIR, safeName), req.file.buffer);
+    image = `/uploads/${safeName}`;
+  } else if (imageUrl) {
+    image = imageUrl;
+  }
+  const item = { id: uid(), createdAt: new Date().toISOString(), title, summary, date, link, image, active: active === 'true' || active === true };
+  items.push(item); writeJson(NEWS_FILE, items);
+  res.json({ ok:true, item });
+});
 // Admin: update
 app.put('/api/admin/news/:id', checkAdmin, (req, res) => {
   const items = readJson(NEWS_FILE, []);

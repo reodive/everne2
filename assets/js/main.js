@@ -1,4 +1,9 @@
 window.addEventListener('load', () => {
+  // Splash fade-out
+  const splash = document.getElementById('splash');
+  if (splash) {
+    setTimeout(()=> splash.classList.add('hide'), 700); // 少し見せてからフェード
+  }
   const wrapper = document.querySelector('.showcase-wrapper');
   const slides = document.querySelector('.slides');
   const slideItems = Array.from(document.querySelectorAll('.slide'));

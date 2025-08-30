@@ -24,11 +24,11 @@ body {
   }
   
   .logo {
-    font-family: 'Times New Roman', serif;
-    font-style: italic;
-    font-weight: bold;
-    font-size: 24px;
-    border-bottom: 2px dotted red;
+    font-family: 'Georgia', serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
   
   .nav-links a {
@@ -196,6 +196,29 @@ body {
 
   .instagram-btn svg path {
     fill: #444 !important;
+  }
+  
+  /* Splash logo on first view */
+  .splash{
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .splash img{
+    width: min(220px, 60vw);
+    height: auto;
+    animation: splash-pop .7s ease-out both;
+  }
+  .splash.hide{ opacity: 0; visibility: hidden; }
+  @keyframes splash-pop{
+    0%{ transform: scale(.8); opacity: 0; }
+    60%{ transform: scale(1.06); opacity: 1; }
+    100%{ transform: scale(1); opacity: 1; }
   }
   @media (max-width: 600px){
     .instagram-btn{ display:none; }
@@ -472,21 +495,41 @@ body {
 
 .model-card {
   border: 1px solid #ccc;
-  padding: 20px;
+  padding: 20px 18px;
   text-align: center;
   background: #fff;
-  min-height: 240px; /* 高めに */
+  min-height: 280px; /* 高めに */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
 }
-.model-card img {
-  width: 110px;
-  height: 110px;
+.model-card .thumb{
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 3/4;              /* 縦長比率で安定 */
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f5;
+  box-shadow: inset 0 0 1px rgba(0,0,0,0.06);
+  margin-bottom: 14px;
+}
+.model-card .thumb img{
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  margin-bottom: 12px;
+  display: block;
+}
+.model-card .model-name{
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 2px 0 0;
+}
+@media (min-width: 1024px){
+  .model-card{ min-height: 300px; padding: 22px 20px; }
+  .model-card .model-name{ font-size: 1.25rem; }
 }
 .model-card p {
   font-size: 0.95rem;

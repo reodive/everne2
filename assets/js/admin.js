@@ -55,10 +55,14 @@ function escapeHtml(s){
 // -------------- News management --------------
 async function loadNews() {
   const headers = {};
-  const t = localStorage.getItem('ADMIN_TOKEN') || '';
+  const t = getToken();
   if (t) headers['x-admin-token'] = t;
   const res = await fetch(`${API_BASE}/api/admin/news`, { headers });
-  if (!res.ok) return;
+  if (!res.ok) {
+    const s = document.getElementById('newsStatus');
+    if (s) s.textContent = '取得に失敗しました（認証またはネットワーク）';
+    return;
+  }
   const data = await res.json();
   const tbody = document.querySelector('#newsTable tbody');
   tbody.innerHTML = '';
@@ -212,26 +216,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   reload.addEventListener('click', loadApps);
   await loadApps();
 
-  // ニュース: 追加
+  // ニュース: 追加（multipart送信に統一）
   document.getElementById('newsAdd').addEventListener('click', async () => {
-    const t = localStorage.getItem('ADMIN_TOKEN') || '';
-    const headers = { 'Content-Type': 'application/json', ...(t?{ 'x-admin-token': t }:{} ) };
-    let body = {
-      title: document.getElementById('newsTitle').value.trim(),
-      date: document.getElementById('newsDate').value,
-      summary: document.getElementById('newsSummary').value.trim(),
-      link: document.getElementById('newsLink').value.trim(),
-      active: document.getElementById('newsActive').checked
-    };
-    if (!body.title) return alert('タイトルは必須です');
-    // 画像: URL優先、無ければファイルをアップロード
-    let imageUrl = (document.getElementById('newsImg')?.value || '').trim();
+    const t = getToken();
+    const fd = new FormData();
+    const title = document.getElementById('newsTitle').value.trim();
+    if (!title) return alert('タイトルは必須です');
+    fd.append('title', title);
+    fd.append('date', document.getElementById('newsDate').value);
+    fd.append('summary', document.getElementById('newsSummary').value.trim());
+    fd.append('link', document.getElementById('newsLink').value.trim());
+    fd.append('active', String(document.getElementById('newsActive').checked));
     const file = document.getElementById('newsImgFile')?.files?.[0];
-    if (!imageUrl && file) {
-      try { const up = await uploadFile(file); imageUrl = up.path; } catch { alert('画像アップロードに失敗しました'); return; }
+    const imageUrl = (document.getElementById('newsImg')?.value || '').trim();
+    if (file) fd.append('image', file);
+    if (imageUrl) fd.append('imageUrl', imageUrl);
+    const res = await fetch(`${API_BASE}/api/admin/news/create`, { method:'POST', headers: t?{ 'x-admin-token': t }:undefined, body: fd });
+    if (!res.ok) {
+      const s = document.getElementById('newsStatus');
+      if (s) s.textContent = '追加に失敗しました（認証または入力エラー）';
+      return;
     }
-    if (imageUrl) body.image = imageUrl;
-    await fetch(`${API_BASE}/api/admin/news`, { method:'POST', headers, body: JSON.stringify(body) });
     document.getElementById('newsTitle').value='';
     document.getElementById('newsSummary').value='';
     document.getElementById('newsLink').value='';

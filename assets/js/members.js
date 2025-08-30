@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       card.className = 'model-card';
       const img = m.image || '/image/everne.png';
       card.innerHTML = `
-        <img src="${img}" alt="${escapeHtml(m.name)}">
-        <p>${escapeHtml(m.name)}</p>
+        <div class="thumb"><img src="${img}" alt="${escapeHtml(m.name)}"></div>
+        <p class="model-name">${escapeHtml(m.name)}</p>
       `;
       grid.appendChild(card);
     });
@@ -48,4 +48,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (q) q.addEventListener('input', render);
   await load();
 });
-
