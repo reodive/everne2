@@ -1,3 +1,11 @@
+:root {
+  --color-text: #444;
+  --color-accent: #e65100;
+  --color-accent-hover: #ff6f00;
+  --color-brand: #e65100;
+  --font-subhead: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 /* フォント */
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Segoe UI', sans-serif;
@@ -34,29 +42,6 @@ body {
     text-decoration: underline;
   }
   
-  /* Instagramボタン */
-  .insta-button {
-    position: absolute;
-    top: 120px;
-    left: 32px;
-  }
-  
-  .insta-button button {
-    width: 48px;
-    height: 48px;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    background-color: white;
-    cursor: pointer;
-  }
-  
-  .insta-button img {
-    width: 60%;
-    height: auto;
-    display: block;
-    margin: auto;
-  }
-  
   /* Hero セクション */
   .hero-banner {
     background-color: #4a4a4a;
@@ -80,11 +65,13 @@ body {
     position: relative;
     max-width: 500px;
     margin: 0 auto;
+    overflow: hidden;
   }
   
   .slides {
     display: flex;
     transition: transform 0.6s ease;
+    width: 100%;
   }
   
   .slide {
@@ -92,6 +79,7 @@ body {
     position: relative;
     max-height: 60vh;
     overflow: hidden;
+    flex-shrink: 0;
   }
   
   .slide img {
@@ -116,6 +104,7 @@ body {
     color: var(--color-brand);
     letter-spacing: 0.2em;
     z-index: 10;
+    pointer-events: none;
   }
   
   .slide-btn {
@@ -133,16 +122,16 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
+    z-index: 50;
     transition: all 0.3s ease;
   }
   
   .slide-btn.left {
-    left: -3rem;
+    left: 10px;
   }
   
   .slide-btn.right {
-    right: -3rem;
+    right: 10px;
   }
   
   .slide-btn:hover {
@@ -183,39 +172,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #000;
-    z-index: 20;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  }
-
-  .instagram-btn:hover {
-    border-color: #000;
-  }
-
-.instagram-btn svg {
-  color: #000;
-  fill: currentColor;
-}
-
-.instagram-btn {
-  color: #000; /* Set default icon color to black */
-}
-
-.instagram-btn {
-    position: fixed;
-    top: 30vh;
-    left: 1em;
-    width: 3em;
-    height: 3em;
-    background: #fff;
-    border: 2px solid #aaa;
-    border-radius: 0.75em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: #444;
     z-index: 20;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition: border-color 0.3s ease, color 0.3s ease;
   }
 
   .instagram-btn:hover {
@@ -281,3 +241,363 @@ body {
     font-size: 0.95em;
     color: #444;
   }
+
+  /* Motto */
+.motto-section {
+  text-align: center;
+  padding: 60px 20px;
+}
+.motto-section h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.motto-section hr {
+  width: 60px;
+  margin: 10px auto 30px;
+  border: 1px solid #555;
+}
+.motto-section p {
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* Recruit */
+.recruit-section {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(255,255,255,0.8)), 
+              url("image/bg-blur.jpg") center/cover no-repeat;
+  padding: 60px 20px;
+}
+.recruit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.recruit-container h2 {
+  font-size: 1.8rem;
+  color: #2d7a2d;
+  margin-bottom: 10px;
+}
+.recruit-container hr {
+  width: 80px;
+  margin: 10px auto 20px;
+  border: 1px solid #aaa;
+}
+.recruit-container .catch {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.recruit-container .detail {
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+.apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.apply-btn:hover {
+  background: #f0f0f0;
+}
+.icon {
+  font-size: 1.2rem;
+}
+
+/* News Section */
+.news-section {
+  background: #f0f0f0;
+  padding: 50px 20px;
+}
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto 30px;
+}
+
+.news-header h2 {
+  font-size: 2rem;
+  color: #e65100; /* オレンジ系 */
+  margin: 0;
+}
+
+.news-header .more-link {
+  font-weight: bold;
+  color: #e65100;
+  text-decoration: none;
+}
+.news-header .more-link:hover {
+  text-decoration: underline;
+}
+
+.news-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.news-card {
+  background: #fff;
+  border: 1px solid #bbb;
+  padding: 20px;
+  text-align: center;
+}
+
+.news-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.news-card hr {
+  width: 60%;
+  margin: 0 auto 15px;
+  border: 1px solid #666;
+}
+
+.news-card p {
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.news-card time {
+  font-size: 0.8rem;
+  color: #222;
+  display: block;
+  text-align: right;
+}
+
+/* 全体 */
+.models-section {
+  background: #f5f5f5;
+  padding: 50px 20px;
+}
+.models-section h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+/* カテゴリブロック */
+.model-category {
+  margin-bottom: 40px;
+  background: #fafafa;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.category-header h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.category-header h3.ladies {
+  color: #c2185b;
+}
+.category-header h3.men {
+  color: #1976d2;
+}
+.category-header h3.mrs {
+  color: #e65100;
+}
+
+.more-link {
+  font-weight: bold;
+  color: #e65100;
+  text-decoration: none;
+}
+.more-link:hover {
+  text-decoration: underline;
+}
+
+/* モデルリスト */
+.model-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.model-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  text-align: center;
+  background: #fff;
+}
+.model-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+.model-card p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* 募集要項セクション */
+.requirements-section {
+  background: #fafafa;
+  padding: 80px 20px;
+}
+
+.requirements-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.requirements-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: #222;
+  letter-spacing: 2px;
+  border-bottom: 2px solid #e65100;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.requirements-container p {
+  margin: 20px 0;
+  line-height: 1.8;
+  color: #333;
+  font-size: 1rem;
+}
+
+.requirements-container small {
+  display: block;
+  margin-top: 10px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.notice-box {
+  background: #f9f9f9;
+  border-left: 5px solid #e65100;
+  padding: 20px 25px;
+  margin: 40px 0;
+  border-radius: 8px;
+}
+
+.notice-box h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #222;
+}
+
+.notice-box ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.notice-box li {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+/* 応募ボタンセクション */
+.apply-section {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.apply-button {
+  display: inline-block;
+  padding: 15px 40px;
+  background: #e65100;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.apply-button:hover {
+  background: #ff6f00;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+/* Footer */
+.footer {
+  position: relative;
+  background: linear-gradient(to bottom, #ec6a6a, #e44d4d);
+  color: #fff;
+  padding: 40px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.footer-logo {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 2rem;
+  margin-bottom: 15px;
+  border-bottom: 2px dotted #fff;
+  display: inline-block;
+}
+
+.footer-left p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-email {
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.footer-dog {
+  position: absolute;
+  top: -25px;
+  right: 25px;
+  width: 70px;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .slide-btn.left {
+    left: 0.5rem;
+  }
+  .slide-btn.right {
+    right: 0.5rem;
+  }
+}
