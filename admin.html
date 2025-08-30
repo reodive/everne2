@@ -23,7 +23,8 @@
     @media(min-width:800px){.grid-2{grid-template-columns:1fr 1fr}}
     .thumb{width:40px;height:40px;object-fit:cover;border-radius:4px}
   </style>
-  <script defer src="assets/js/admin.js"></script>
+  <script defer src="assets/js/debug.js?v=2"></script>
+  <script defer src="assets/js/admin.js?v=2"></script>
   </head>
   <body>
     <div class="wrap">
@@ -79,6 +80,14 @@
             <label>リンク（任意）</label>
             <input id="newsLink" type="url" placeholder="https://…" />
           </div>
+          <div>
+            <label>画像ファイル（任意）</label>
+            <input id="newsImgFile" type="file" accept="image/*" />
+          </div>
+          <div>
+            <label>画像URL（任意）</label>
+            <input id="newsImg" type="text" placeholder="/uploads/... または https://..." />
+          </div>
           <div class="inline">
             <label><input id="newsActive" type="checkbox" checked /> 公開</label>
           </div>
@@ -88,7 +97,7 @@
           <span class="muted" id="newsStatus"></span>
         </div>
         <table id="newsTable">
-          <thead><tr><th>日付</th><th>タイトル</th><th>概要</th><th>リンク</th><th>公開</th><th>操作</th></tr></thead>
+          <thead><tr><th>日付</th><th>画像</th><th>タイトル</th><th>概要</th><th>リンク</th><th>公開</th><th>操作</th></tr></thead>
           <tbody></tbody>
         </table>
       </section>

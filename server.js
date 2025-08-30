@@ -181,9 +181,9 @@ app.get('/api/admin/news', checkAdmin, (_req, res) => {
 // Admin: create
 app.post('/api/admin/news', checkAdmin, (req, res) => {
   const items = readJson(NEWS_FILE, []);
-  const { title, summary = '', date = new Date().toISOString().slice(0,10), link = '', active = true } = req.body || {};
+  const { title, summary = '', date = new Date().toISOString().slice(0,10), link = '', image = '', active = true } = req.body || {};
   if (!title) return res.status(400).json({ ok:false, error:'title_required' });
-  const item = { id: uid(), createdAt: new Date().toISOString(), title, summary, date, link, active: !!active };
+  const item = { id: uid(), createdAt: new Date().toISOString(), title, summary, date, link, image, active: !!active };
   items.push(item); writeJson(NEWS_FILE, items);
   res.json({ ok: true, item });
 });

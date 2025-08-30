@@ -78,6 +78,7 @@ body {
   
   .slides {
     display: flex;
+    align-items: center; /* center images when using contain */
     transition: transform 0.6s ease;
     width: 100%;
   }
@@ -97,7 +98,8 @@ body {
     max-width: none;
     margin: 0 auto;
     display: block;
-    object-fit: cover;
+    object-fit: contain; /* avoid cropping portrait shots */
+    background: #f4f4f7;
   }
   
   .slide::before {
@@ -361,20 +363,25 @@ body {
 
 .news-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr;              /* モバイル1列 */
   gap: 20px;
-  max-width: 1100px;
+  max-width: 1280px;                       /* 5列に対応 */
   margin: 0 auto;
 }
-@media (max-width: 480px){
-  .news-cards{ grid-template-columns: 1fr; }
-}
+@media (min-width: 680px){ .news-cards{ grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px){ .news-cards{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px){ .news-cards{ grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1400px){ .news-cards{ grid-template-columns: repeat(5, 1fr); } }
 
 .news-card {
   background: #fff;
   border: 1px solid #bbb;
-  padding: 20px;
+  padding: 20px 24px;
   text-align: center;
+  min-height: 200px;              /* 高さを安定させる */
+  display: flex;                  /* 下部に日付を揃える */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .news-card h3 {
@@ -397,6 +404,7 @@ body {
   font-size: 0.8rem;
   color: #222;
   display: block;
+  margin-top: 8px;
   text-align: right;
 }
 
@@ -452,21 +460,33 @@ body {
 /* モデルリスト */
 .model-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 15px;
+  grid-template-columns: 1fr; /* デフォルト1列 */
+  gap: 24px; /* 余白広めに */
+}
+@media (min-width: 600px){
+  .model-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px){
+  .model-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 .model-card {
   border: 1px solid #ccc;
-  padding: 15px;
+  padding: 20px;
   text-align: center;
   background: #fff;
+  min-height: 240px; /* 高めに */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
 }
 .model-card img {
-  width: 80px;
-  height: 80px;
+  width: 110px;
+  height: 110px;
   object-fit: cover;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .model-card p {
   font-size: 0.95rem;
@@ -626,4 +646,12 @@ body {
   .hero-banner h2{ font-size: 20px; }
   .hero-banner p{ font-size: 14px; }
   .about-photo img{ width: 60vw; max-width: 280px; }
+}
+
+/* --- Hard clamp for slider in case of stale cache/specificity issues --- */
+.showcase-wrapper .slide,
+.showcase-wrapper .slide img { max-height: 360px !important; }
+@media (max-width: 768px){
+  .showcase-wrapper .slide,
+  .showcase-wrapper .slide img { max-height: 300px !important; }
 }

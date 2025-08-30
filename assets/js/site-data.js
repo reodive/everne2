@@ -11,7 +11,7 @@
     const res = await fetch(`${API_BASE}/api/news`, { cache:'no-store' });
     if(res.ok){
       const data = await res.json();
-      const list = (data.items||[]).slice(0,4);
+      const list = (data.items||[]).slice(0,5);
       if(list.length){
         const wrap = document.getElementById('newsCards');
         if (wrap){
@@ -20,6 +20,7 @@
             const el = document.createElement('article');
             el.className = 'news-card';
             el.innerHTML = `
+              ${n.image?`<img src="${n.image}" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;"/>`:''}
               <h3>TOPICS</h3>
               <hr />
               <p>${escapeHtml(n.title||n.summary||'')}</p>
@@ -52,9 +53,9 @@
   fillMembers('Ladies','list-ladies');
   fillMembers('Men','list-men');
   fillMembers('Mrs','list-mrs');
+  fillMembers('Kids','list-kids');
 
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   }
 })();
-
