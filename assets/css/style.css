@@ -210,9 +210,9 @@ body {
     transition: opacity .6s ease, visibility .6s ease;
   }
   .splash img{
-    width: min(220px, 60vw);
+    width: min(90vw, 90vh);   /* 画面いっぱいに大きく */
     height: auto;
-    animation: splash-pop .7s ease-out both;
+    animation: splash-pop 1s ease-out both;
   }
   .splash.hide{ opacity: 0; visibility: hidden; }
   @keyframes splash-pop{

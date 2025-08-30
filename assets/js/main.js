@@ -2,7 +2,7 @@ window.addEventListener('load', () => {
   // Splash fade-out
   const splash = document.getElementById('splash');
   if (splash) {
-    setTimeout(()=> splash.classList.add('hide'), 700); // 少し見せてからフェード
+    setTimeout(()=> splash.classList.add('hide'), 1200); // 少し長めに表示してからフェード
   }
   const wrapper = document.querySelector('.showcase-wrapper');
   const slides = document.querySelector('.slides');
