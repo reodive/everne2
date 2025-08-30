@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>応募フォーム | Everne</title>
+  <style>
+    :root{
+      --brand:#ef5a3c; /* コーポレートのアクセントに合わせて調整可 */
+      --ink:#1f2937; --muted:#6b7280; --bg:#f7f7f8; --card:#ffffff;
+      --error:#dc2626; --ok:#16a34a;
+      --radius:16px;
+    }
+    /* レイアウト崩れ対策: 余白を含めて幅計算 */
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family: "Noto Sans JP",system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN",sans-serif;background:var(--bg);color:var(--ink);margin:0}
+    .wrap{max-width:920px;margin:24px auto;padding:16px}
+    header{margin:8px 0 24px}
+    h1{font-size:clamp(22px,3vw,32px);margin:0 0 6px}
+    p.lead{color:var(--muted);margin:0}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 24px rgba(0,0,0,.06);padding:20px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:700px){.grid-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+    label{font-weight:600;font-size:14px}
+    .req{color:var(--brand);margin-left:6px;font-weight:700}
+    input,select,textarea{
+      width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;font-size:15px;
+    }
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(239,90,60,.18)}
+    .hint{color:var(--muted);font-size:12px;margin-top:6px}
+    .inline{display:flex;gap:10px;align-items:center}
+    .error{color:var(--error);font-size:13px;margin-top:6px;display:none}
+    .ok{color:var(--ok);font-size:14px;display:none;margin:8px 0}
+    .section-title{font-size:18px;margin:10px 0;font-weight:700;border-left:6px solid var(--brand);padding-left:10px}
+    .files-note{font-size:13px;color:var(--muted);margin-top:4px}
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+    button{
+      appearance:none;border:none;border-radius:999px;padding:14px 28px;font-weight:700;cursor:pointer;
+      background:var(--brand);color:#fff;box-shadow:0 10px 20px rgba(239,90,60,.25),0 2px 6px rgba(0,0,0,.06);transition:transform .06s ease, box-shadow .2s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .policy{font-size:12px;color:var(--muted)}
+    .badge{display:inline-block;font-size:12px;background:#fff5f2;border:1px solid #ffd9ce;color:#b64a2f;padding:4px 8px;border-radius:999px;margin-left:8px}
+    footer{color:#9ca3af;text-align:center;font-size:12px;margin:24px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Everne 応募フォーム <span class="badge">入会金・月会費不要</span></h1>
+      <p class="lead">年齢・経験を問わず歓迎します。※未成年は保護者同意が必要です。</p>
+    </header>
+
+    <form id="applyForm" class="card" method="POST" action="/api/apply" enctype="multipart/form-data" novalidate>
+      <!-- ↑ バックエンドが未実装なら一旦 action="#" に。Formspree等を使うならそのURLに置換。 -->
+
+      <!-- 1. 応募者情報 -->
+      <div class="section-title">応募者情報</div>
+      <div class="grid grid-2">
+        <div>
+          <label>氏名<span class="req">＊</span></label>
+          <input type="text" name="name" required placeholder="例）山田 花子">
+          <div class="error" data-err="name">氏名を入力してください。</div>
+        </div>
+        <div>
+          <label>フリガナ<span class="req">＊</span></label>
+          <input type="text" name="kana" required placeholder="例）ヤマダ ハナコ">
+          <div class="error" data-err="kana">フリガナを入力してください。</div>
+        </div>
+        <div>
+          <label>年齢<span class="req">＊</span></label>
+          <input type="number" name="age" min="0" max="120" required placeholder="例）20">
+          <div class="hint">18歳未満の場合、保護者情報の入力欄が表示されます。</div>
+          <div class="error" data-err="age">年齢を入力してください。</div>
+        </div>
+        <div>
+          <label>性別（任意）</label>
+          <select name="gender">
+            <option value="">選択しない</option>
+            <option>女性</option><option>男性</option><option>その他</option><option>無回答</option>
+          </select>
+        </div>
+        <div>
+          <label>メールアドレス<span class="req">＊</span></label>
+          <input type="email" name="email" required placeholder="例）name@example.com">
+          <div class="error" data-err="email">有効なメールアドレスを入力してください。</div>
+        </div>
+        <div>
+          <label>電話番号（ハイフン可）<span class="req">＊</span></label>
+          <input type="tel" name="tel" required placeholder="例）090-1234-5678" inputmode="tel">
+          <div class="error" data-err="tel">電話番号を入力してください。</div>
+        </div>
+        <div>
+          <label>居住エリア（任意）</label>
+          <input type="text" name="area" placeholder="例）東京都・大阪府 など">
+        </div>
+        <div>
+          <label>芸能活動の有無</label>
+          <select name="experienced">
+            <option value="未経験">未経験</option>
+            <option value="経験あり">経験あり</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 2. 基本プロフィール（任意だが推奨） -->
+      <div class="section-title">プロフィール（任意）</div>
+      <div class="grid grid-2">
+        <div>
+          <label>身長（cm）</label>
+          <input type="number" name="height" min="0" max="250">
+        </div>
+        <div>
+          <label>服のサイズ</label>
+          <input type="text" name="size" placeholder="例）S / M / 130 など">
+        </div>
+      </div>
+
+      <!-- 3. 写真の提出 -->
+      <div class="section-title">写真アップロード<span class="badge">3カ月以内に撮影</span></div>
+      <div class="grid">
+        <div>
+          <label>写真（最大3枚・JPG/PNG・各5MBまで）<span class="req">＊</span></label>
+          <input type="file" name="photos" id="photos" accept=".jpg,.jpeg,.png" multiple required>
+          <div class="files-note">※ 正面・全身・自由の3点が目安。スマホ可。</div>
+          <div class="error" data-err="photos">写真ファイル（JPG/PNG）を1〜3枚、各5MB以下で選択してください。</div>
+        </div>
+      </div>
+
+      <!-- 4. 志望理由など -->
+      <div class="section-title">自己PR / 応募動機</div>
+      <div class="grid">
+        <div>
+          <label>自由記述（任意）</label>
+          <textarea name="pr" rows="6" placeholder="例）得意分野、活動希望、SNSリンク等"></textarea>
+        </div>
+      </div>
+
+      <!-- 5. 未成年の保護者情報（年齢入力で自動表示） -->
+      <div id="guardianBlock" class="grid" style="display:none">
+        <div class="section-title">保護者情報（18歳未満は必須）</div>
+        <div class="grid grid-2">
+          <div>
+            <label>保護者氏名<span class="req">＊</span></label>
+            <input type="text" name="guardian_name">
+            <div class="error" data-err="guardian_name">保護者氏名を入力してください。</div>
+          </div>
+          <div>
+            <label>保護者連絡先（メール or 電話）<span class="req">＊</span></label>
+            <input type="text" name="guardian_contact" placeholder="例）parent@example.com / 090-xxxx-xxxx">
+            <div class="error" data-err="guardian_contact">保護者連絡先を入力してください。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 注意事項の確認 -->
+      <div class="section-title">応募に関する注意事項</div>
+      <ul class="hint" style="margin-top:-6px">
+        <li>入会金・月会費・書類選考料は一切不要です。</li>
+        <li>書類選考を通過された方のみにご連絡いたします。</li>
+        <li>ご提出書類の返却は致しかねます。審査終了後は適切に処理します。</li>
+      </ul>
+
+      <div class="inline" style="margin-top:8px">
+        <input id="agree" type="checkbox" required>
+        <label for="agree">上記およびプライバシーポリシーに同意します<span class="req">＊</span></label>
+      </div>
+      <div class="error" data-err="agree">同意が必要です。</div>
+
+      <!-- 送信 -->
+      <div class="actions">
+        <button id="submitBtn" type="submit">送信する</button>
+      </div>
+
+      <div class="ok" id="okMsg">送信中…完了後は結果画面に遷移します。</div>
+    </form>
+
+    <footer>© Everne</footer>
+  </div>
+
+  <script>
+    // ユーティリティ
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
+
+    const form = $('#applyForm');
+    const guardianBlock = $('#guardianBlock');
+    const okMsg = $('#okMsg');
+
+    // 年齢に応じて保護者欄を表示
+    form.age.addEventListener('input', () => {
+      const age = Number(form.age.value || 0);
+      guardianBlock.style.display = age < 18 ? 'block' : 'none';
+    });
+
+    // 送信前バリデーション
+    form.addEventListener('submit', (e) => {
+      // 手動で細かくチェック
+      let valid = true;
+      // 全エラー非表示
+      $$('.error').forEach(el => el.style.display='none');
+
+      const must = ['name','kana','age','email','tel'];
+      must.forEach(n => {
+        if(!form[n].value.trim()){ showErr(n); valid=false; }
+      });
+
+      // メール形式
+      if(form.email.value && !/^\S+@\S+\.\S+$/.test(form.email.value)){ showErr('email'); valid=false; }
+
+      // 写真: 1〜3枚 / 拡張子 / 5MB以下
+      const files = $('#photos').files;
+      if(files.length === 0 || files.length > 3){ showErr('photos'); valid=false; }
+      else{
+        for(const f of files){
+          const okExt = /\.(jpe?g|png)$/i.test(f.name);
+          if(!okExt || f.size > 5*1024*1024){ showErr('photos'); valid=false; break; }
+        }
+      }
+
+      // 未成年は保護者必須
+      const age = Number(form.age.value || 0);
+      if(age < 18){
+        if(!form.guardian_name.value.trim()){ showErr('guardian_name'); valid=false; }
+        if(!form.guardian_contact.value.trim()){ showErr('guardian_contact'); valid=false; }
+      }
+
+      // 同意
+      if(!$('#agree').checked){ showErr('agree'); valid=false; }
+
+      if(!valid){
+        e.preventDefault();
+        window.scrollTo({top: form.getBoundingClientRect().top + window.scrollY - 20, behavior:'smooth'});
+        return;
+      }
+
+      // フロント側の送信中表示（任意）
+      $('#submitBtn').disabled = true;
+      okMsg.style.display = 'block';
+    });
+
+    function showErr(name){
+      const el = document.querySelector(`[data-err="${name}"]`);
+      if(el){ el.style.display='block'; }
+    }
+  </script>
+</body>
+</html>
