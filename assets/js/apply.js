@@ -1,5 +1,6 @@
 // js/apply.js
-const API_BASE = 'http://127.0.0.1:5174';
+// Use same-origin by default to avoid CORS issues
+const API_BASE = '';
 console.debug('[apply] API_BASE =', API_BASE);
 
 document.addEventListener('DOMContentLoaded', () => {

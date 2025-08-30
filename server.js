@@ -10,20 +10,28 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 5174;
 
-// CORS: allow configured origins; if none provided, allow all.
+// CORS: apply only to /api endpoints
 const ALLOWED_ORIGINS = (process.env.FRONT_ORIGIN || '')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
-app.use(cors({
+const corsMw = cors({
   origin: (origin, cb) => {
     if (ALLOWED_ORIGINS.length === 0) return cb(null, true);
-    // Allow file:// (no origin) and explicit matches
+    // Allow no-origin (same-origin navigations and file://) and explicit matches
     if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'));
   }
-}));
+});
+app.use('/api', corsMw);
+app.options('/api/*', corsMw);
 app.use(express.json());
+
+// リクエスト簡易ログ（デバッグ用）
+app.use((req, _res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url}`);
+  next();
+});
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -173,5 +181,45 @@ app.get('/api/admin/applications.csv', checkAdmin, (req, res) => {
 
 // 保存したアップロードファイルを静的配信
 app.use('/uploads', express.static(UPLOAD_DIR));
+
+// 静的サイトを提供（プロジェクト直下）
+const PUBLIC_DIR = process.cwd();
+app.use(express.static(PUBLIC_DIR));
+
+// ルート/ショートカット
+app.get('/', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
+app.get('/apply', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'apply.html')));
+app.get('/admin', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin.html')));
+app.get('/healthz', (_req, res) => res.json({ ok: true }));
+
+// 静的ファイル配信（明示パス）
+const ROOT = process.cwd();
+app.use('/assets', express.static(path.join(ROOT, 'assets')));
+app.use('/image',  express.static(path.join(ROOT, 'image')));
+
+// 主要HTMLを明示ルーティング（Safariのキャッシュやルート解決の差異を避ける）
+app.get(['/', '/index.html'], (_req, res) => {
+  res.sendFile(path.join(ROOT, 'index.html'));
+});
+app.get('/apply.html', (_req, res) => {
+  res.sendFile(path.join(ROOT, 'apply.html'));
+});
+app.get('/admin.html', (_req, res) => {
+  res.sendFile(path.join(ROOT, 'admin.html'));
+});
+
+// 任意の .html を動的に配信（/foo.html -> ROOT/foo.html）
+app.get(/^\/.+\.html$/, (req, res) => {
+  const target = path.join(ROOT, decodeURIComponent(req.path.replace(/^\//, '')));
+  if (fs.existsSync(target)) {
+    return res.sendFile(target);
+  }
+  return res.status(404).send('Not Found');
+});
+
+// 最後の保険: その他のGETは index.html を返す（/api 等は既に上でマッチ）
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(ROOT, 'index.html'));
+});
 
 app.listen(PORT, () => console.log(`Form server on http://localhost:${PORT}`));

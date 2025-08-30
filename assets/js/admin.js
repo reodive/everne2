@@ -1,4 +1,5 @@
-const API_BASE = 'http://127.0.0.1:5174';
+// Same-origin base
+const API_BASE = '';
 
 function getToken() {
   let t = localStorage.getItem('ADMIN_TOKEN') || '';
@@ -82,4 +83,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   reload.addEventListener('click', load);
   await load();
 });
-
