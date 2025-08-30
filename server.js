@@ -10,21 +10,26 @@ import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 5174;
 
-// CORS: apply only to /api endpoints
+// CORS: apply only to /api endpoints, allow same-origin automatically
 const ALLOWED_ORIGINS = (process.env.FRONT_ORIGIN || '')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
-const corsMw = cors({
-  origin: (origin, cb) => {
-    if (ALLOWED_ORIGINS.length === 0) return cb(null, true);
-    // Allow no-origin (same-origin navigations and file://) and explicit matches
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS'));
+const corsDelegate = (req, cb) => {
+  // If no whitelist, allow all (dev-friendly)
+  if (ALLOWED_ORIGINS.length === 0) return cb(null, { origin: true });
+  const origin = req.headers.origin;
+  const host = req.headers.host; // e.g., localhost:5174
+  // Always allow same-origin and no-origin
+  if (!origin || origin === `http://${host}` || origin === `https://${host}`) {
+    return cb(null, { origin: true });
   }
-});
-app.use('/api', corsMw);
-app.options('/api/*', corsMw);
+  // Allow explicitly whitelisted origins
+  if (ALLOWED_ORIGINS.includes(origin)) return cb(null, { origin: true });
+  return cb(new Error('Not allowed by CORS'));
+};
+app.use('/api', cors(corsDelegate));
+app.options('/api/*', cors(corsDelegate));
 app.use(express.json());
 
 // リクエスト簡易ログ（デバッグ用）
